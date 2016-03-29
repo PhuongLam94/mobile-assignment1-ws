@@ -331,17 +331,20 @@ public class Database {
     //return picture
     public Picture GetPicture(int pictureId, int userId) {
         try {
+            System.out.println("in getpicture");
             String SQL = "SELECT id, content, description FROM Picture WHERE userid = " + userId;
-
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
             Picture res=null;
             int prev=0;
             while (rs.next()){
+                System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(3));
                 if (rs.getInt(1) == pictureId){
                     res=_returnPicture(rs);
                     res.setPrev(prev);
                     res.setNext(rs.next()?rs.getInt(1):0);
+                } else{
+                    prev=rs.getInt(1);
                 }
             }
             return res;
@@ -411,6 +414,7 @@ public class Database {
 
     public boolean AddPicture(Picture picture, int userId) {
         try {
+            System.out.println(picture.getDescription());
             String SQL = String.format("INSERT INTO Picture(id, content, description, userId) VALUES(%d,'%s','%s',%d)", picture.getId(), picture.getContent(), picture.getDescription(), userId);
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
@@ -470,6 +474,87 @@ public class Database {
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             System.out.println("abc");
+            return true;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+    
+    public boolean EditPassword(int userId, String password){
+        try {
+            String SQL = String.format("UPDATE userdb SET password='%s'"
+                    + "        WHERE id='%d'", password, userId);
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(SQL);
+            return true;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+    public boolean EditPasswordToDefault(int userId){
+         try {
+            String SQL = String.format("UPDATE userdb SET password='%s'"
+                    + "        WHERE id='%d'", ConstantHelper.DEFAULTPASSWORD, userId);
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(SQL);
+            return true;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+    public boolean EditStatus(int userId, int status){
+        try {
+            String SQL = String.format("UPDATE userdb SET status='%d'"
+                    + "        WHERE id='%d'", status, userId);
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(SQL);
+            return true;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+    //delete functions
+    public boolean DeletePicture(int pictureId) {
+        try {
+            String SQL = "DELETE FROM Picture WHERE id="+pictureId;
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(SQL);
             return true;
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());

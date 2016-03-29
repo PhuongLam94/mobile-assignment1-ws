@@ -60,19 +60,30 @@ public class AuthenticationHelper {
         }
         return false;
     }
+    
+    public int CheckPassword(String authCredentials, String password){
+        if (authCredentials != null) {
+            String[] token = _parseUserNameAndPassword(authCredentials);
+            Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+            int id = db.CheckUser(token[0], token[1]);
+            if (token[1].equals(password)){
+                return id;
+            } else {
+                return -1;
+            }
+        }
+        return -1;
+    }
 
     private String[] _parseUserNameAndPassword(String authCredentials) {
-        System.out.println(authCredentials);
         String encodedUserPassword = authCredentials.replaceFirst("Basic ", "");
         String usernameAndPassword = "";
         try {
             byte[] decodedBytes = DatatypeConverter.parseBase64Binary(encodedUserPassword);
             usernameAndPassword = new String(decodedBytes, "UTF-8");
-            System.out.println(usernameAndPassword);
         } catch (IOException ioe) {
             System.err.println(ioe.getMessage());
         }
-
         return usernameAndPassword.split(":");
     }
 }

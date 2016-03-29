@@ -8,9 +8,9 @@ package com.phuonglam.datingapp.service;
 import com.phuonglam.database.Database;
 import com.phuonglam.helper.AuthenticationHelper;
 import com.phuonglam.helper.ConstantHelper;
+import com.phuonglam.pojo.Password;
 import com.phuonglam.pojo.User;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -71,6 +71,60 @@ public class PutService {
             }
         } else {
             return Response.status(Response.Status.OK).entity("{\"message\": \"You are not allowed to set friend status of this two users\"}").build();
+        }
+    }
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/setPassword")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response setPassword(@Context HttpHeaders httpHeaders, Password passInfo) {
+        String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+        int userId = authHelper.CheckPassword(authCredentials, passInfo.getOldPassword());
+        if (userId != -1) {
+            if (db.EditPassword(userId, passInfo.getNewPassword())) {
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Successful\"}").build();
+            } else {
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Failed\"}").build();
+            }
+        } else {
+            return Response.status(Response.Status.OK).entity("{\"message\": \"Old password's not right\"}").build();
+        }
+    }
+    
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/resetPassword/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response resetPassword(@Context HttpHeaders httpHeaders, @PathParam("userId") int userId) {
+        String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+        if (authHelper.CheckAdmin(authCredentials)) {
+            if (db.EditPasswordToDefault(userId)) {
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Successful\"}").build();
+            } else {
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Failed\"}").build();
+            }
+        } else {
+            return Response.status(Response.Status.OK).entity("{\"message\": \"You are not allowed to change this user password\"}").build();
+        }
+    }
+    
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/setAdmin/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response setAdmin(@Context HttpHeaders httpHeaders, @PathParam("userId") int userId) {
+        String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+        if (authHelper.CheckAdmin(authCredentials)) {
+            if (db.EditStatus(userId, ConstantHelper.ADMINSTATUS)) {
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Successful\"}").build();
+            } else {
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Failed\"}").build();
+            }
+        } else {
+            return Response.status(Response.Status.OK).entity("{\"message\": \"You are not allowed to set this user as admin\"}").build();
         }
     }
 }

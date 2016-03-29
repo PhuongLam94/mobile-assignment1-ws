@@ -48,6 +48,17 @@ public class GetService {
     }
     
     @GET
+    @Path("/checkadmin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response checkAdmin(@Context HttpHeaders httpHeaders){
+        String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        if ( authHelper.CheckAdmin(authCredentials)){
+            return Response.status(Response.Status.OK).entity("{\"message\": \"Admin\"}").build();
+        } else {
+            return Response.status(Response.Status.OK).entity("{\"message\": \"Normal user\"}").build();
+        }
+    }
+    @GET
     @Path("/getuser/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@Context HttpHeaders httpHeaders, @PathParam("id") int id) throws ParseException{
