@@ -30,6 +30,9 @@ public class User {
     private int gender;
     private String birthday;
     private int friendStatus; //-1: no relationship,0: current user, 1: friend with current user, 2: request sent, 3: request received
+    private float longitude;
+    private float lattitude;
+    
     public User(){
         message="";
     }
@@ -84,4 +87,10 @@ public class User {
     
     public int getFriendStatus(){return this.friendStatus;}
     public void setFriendStatus(int friendStatus){this.friendStatus = friendStatus;}
+    
+    public float getLongitude(){return this.longitude;}
+    public void setLongitude(float longitude){this.longitude = longitude;}
+    
+    public float getLattitude(){return this.lattitude;}
+    public void setLattitude(float lattitude){this.lattitude = lattitude;}
 }

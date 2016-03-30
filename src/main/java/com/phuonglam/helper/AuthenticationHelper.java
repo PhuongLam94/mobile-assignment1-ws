@@ -15,11 +15,14 @@ import javax.xml.bind.DatatypeConverter;
 
 public class AuthenticationHelper {
 
-    public int CheckUser(String authCredentials) {
+    public int CheckUser(String authCredentials){
+        return CheckUser(authCredentials, 0, 0);
+    }
+    public int CheckUser(String authCredentials, float longi, float latti) {
         if (authCredentials != null) {
             String[] token = _parseUserNameAndPassword(authCredentials);
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
-            return db.CheckUser(token[0], token[1]);
+            return db.CheckUser(token[0], token[1], longi, latti);
         }
         return -1;
     }
@@ -28,7 +31,7 @@ public class AuthenticationHelper {
         if (authCredentials != null) {
             String[] token = _parseUserNameAndPassword(authCredentials);
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
-            int id = db.CheckUser(token[0], token[1]);
+            int id = db.CheckUser(token[0], token[1], 0, 0);
             System.out.println(id);
             if (id == userId) {
                 return 0;
@@ -44,7 +47,9 @@ public class AuthenticationHelper {
         if (authCredentials != null) {
             String[] token = _parseUserNameAndPassword(authCredentials);
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
-            int id = db.CheckUser(token[0], token[1]);
+            int id = db.CheckUser(token[0], token[1], 0, 0);
+            db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+            
             return db.GetUserStatus(id) == ConstantHelper.ADMINSTATUS;
         }
         return false;
@@ -54,7 +59,7 @@ public class AuthenticationHelper {
         if (authCredentials != null) {
             String[] token = _parseUserNameAndPassword(authCredentials);
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
-            int id = db.CheckUser(token[0], token[1]);
+            int id = db.CheckUser(token[0], token[1], 0, 0);
 
             return id == userId;
         }
@@ -65,7 +70,7 @@ public class AuthenticationHelper {
         if (authCredentials != null) {
             String[] token = _parseUserNameAndPassword(authCredentials);
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
-            int id = db.CheckUser(token[0], token[1]);
+            int id = db.CheckUser(token[0], token[1], 0, 0);
             if (token[1].equals(password)){
                 return id;
             } else {

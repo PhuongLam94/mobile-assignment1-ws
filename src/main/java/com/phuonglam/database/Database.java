@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  *
@@ -112,13 +113,20 @@ public class Database {
         return 0;
     }
 
-    public int CheckUser(String userName, String password) {
+    public int CheckUser(String userName, String password, float longi, float latti) {
         try {
+            System.out.println(userName + " " + password + " " + longi + " " + latti);
             if (userName != null && password != null) {
                 String SQL = "SELECT id FROM userdb WHERE username = '" + userName + "' AND password = '" + password + "';";
                 Statement stmt = this.dbConnection.createStatement();
                 ResultSet rs = stmt.executeQuery(SQL);
                 if (rs.next()) {
+                    if (longi != 0 && latti != 0) {
+                        String SQL2 = String.format(Locale.ENGLISH, "UPDATE userdb set longitude=%f, lattitude=%f WHERE id=%d", longi, latti, rs.getInt(1));
+                        System.out.println(SQL2);
+                        Statement stmt2 = this.dbConnection.createStatement();
+                        stmt2.execute(SQL2);
+                    }
                     return rs.getInt(1);
                 } else {
                     return -1;
@@ -218,7 +226,7 @@ public class Database {
 
     public User GetUserLess(int userId) {
         try {
-            String SQL = "SELECT name, avatar, id FROM userdb WHERE id = " + userId;
+            String SQL = "SELECT name, avatar, id, status FROM userdb WHERE id = " + userId;
 
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
@@ -243,10 +251,10 @@ public class Database {
     public int GetUserStatus(int userId) {
         try {
             String SQL = "SELECT status FROM userdb WHERE id = " + userId;
-
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
             if (rs.next()) {
+                System.out.println(rs.getInt(1));
                 return rs.getInt(1);
             }
         } catch (SQLException sqle) {
@@ -265,12 +273,13 @@ public class Database {
 
     public List<User> GetListAllUser() {
         try {
-            String SQL = "SELECT name, avatar FROM userdb";
+            String SQL = "SELECT name, avatar, id, status FROM userdb";
             List<User> lstUser = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
             while (rs.next()) {
                 User res = _returnUserLess(rs);
+                System.out.println(res.getName());
                 lstUser.add(res);
             }
             return lstUser;
@@ -308,7 +317,8 @@ public class Database {
                     }
                 }
                 if (status != 2) {
-                    User temp = GetUserLess(getUser);
+                    Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+                    User temp = db.GetUserLess(getUser);
                     temp.setFriendStatus(status);
                     lstFriend.add(temp);
                 }
@@ -328,23 +338,78 @@ public class Database {
         return null;
     }
 
-    //return picture
+    public List<User> GetUserNear(float lon, float lat, int userId) {
+        try {
+            String SQL = "SELECT name, avatar, id, status, longitude, lattitude FROM userdb WHERE id != " + userId;
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            List<User> lstUser = new ArrayList<>();
+            while (rs.next()) {
+                double distance = _returnDistance(lon, lat, rs.getFloat(5), rs.getFloat(6));
+                if (distance <= 10) {
+                    User res = _returnUserLess(rs);
+                    lstUser.add(res);
+                }
+            }
+            return lstUser;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<User> GetUserSearch(String userName, int userId) {
+        try {
+            String SQL = "SELECT name, avatar, id, status FROM userdb WHERE id != " + userId;
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            List<User> lstUser = new ArrayList<>();
+            while (rs.next()) {
+                if (rs.getString(1).toLowerCase().contains(userName.toLowerCase())) {
+                    User res = _returnUserLess(rs);
+                    lstUser.add(res);
+                }
+            }
+            return lstUser;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+//return picture
+
     public Picture GetPicture(int pictureId, int userId) {
         try {
             System.out.println("in getpicture");
             String SQL = "SELECT id, content, description FROM Picture WHERE userid = " + userId;
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
-            Picture res=null;
-            int prev=0;
-            while (rs.next()){
-                System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(3));
-                if (rs.getInt(1) == pictureId){
-                    res=_returnPicture(rs);
+            Picture res = null;
+            int prev = 0;
+            while (rs.next()) {
+                System.out.println(rs.getInt(1) + " " + rs.getString(2) + " " + rs.getString(3));
+                if (rs.getInt(1) == pictureId) {
+                    res = _returnPicture(rs);
                     res.setPrev(prev);
-                    res.setNext(rs.next()?rs.getInt(1):0);
-                } else{
-                    prev=rs.getInt(1);
+                    res.setNext(rs.next() ? rs.getInt(1) : 0);
+                } else {
+                    prev = rs.getInt(1);
                 }
             }
             return res;
@@ -488,8 +553,8 @@ public class Database {
         }
         return false;
     }
-    
-    public boolean EditPassword(int userId, String password){
+
+    public boolean EditPassword(int userId, String password) {
         try {
             String SQL = String.format("UPDATE userdb SET password='%s'"
                     + "        WHERE id='%d'", password, userId);
@@ -509,8 +574,9 @@ public class Database {
         }
         return false;
     }
-    public boolean EditPasswordToDefault(int userId){
-         try {
+
+    public boolean EditPasswordToDefault(int userId) {
+        try {
             String SQL = String.format("UPDATE userdb SET password='%s'"
                     + "        WHERE id='%d'", ConstantHelper.DEFAULTPASSWORD, userId);
             Statement stmt = this.dbConnection.createStatement();
@@ -529,7 +595,8 @@ public class Database {
         }
         return false;
     }
-    public boolean EditStatus(int userId, int status){
+
+    public boolean EditStatus(int userId, int status) {
         try {
             String SQL = String.format("UPDATE userdb SET status='%d'"
                     + "        WHERE id='%d'", status, userId);
@@ -549,10 +616,11 @@ public class Database {
         }
         return false;
     }
+
     //delete functions
     public boolean DeletePicture(int pictureId) {
         try {
-            String SQL = "DELETE FROM Picture WHERE id="+pictureId;
+            String SQL = "DELETE FROM Picture WHERE id=" + pictureId;
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             return true;
@@ -621,6 +689,7 @@ public class Database {
         res.setName(rs.getString(1));
         res.setAvatar(rs.getString(2));
         res.setId(rs.getInt(3));
+        res.setStatus(rs.getInt(4));
         return res;
     }
 
@@ -630,5 +699,13 @@ public class Database {
         res.setContent(rs.getString(2));
         res.setDescription(rs.getString(3));
         return res;
+    }
+
+    private double _returnDistance(float lon1, float lat1, float lon2, float lat2) {
+        double p = 0.017453292519943295;    // Math.PI / 180
+        double a = 0.5 - Math.cos((lat2 - lat1) * p) / 2
+                + Math.cos(lat1 * p) * Math.cos(lat2 * p)
+                * (1 - Math.cos((lon2 - lon1) * p)) / 2;
+        return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
     }
 }
