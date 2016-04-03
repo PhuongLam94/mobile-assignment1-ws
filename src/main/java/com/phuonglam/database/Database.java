@@ -118,6 +118,7 @@ public class Database {
             System.out.println(userName + " " + password + " " + longi + " " + latti);
             if (userName != null && password != null) {
                 String SQL = "SELECT id FROM userdb WHERE username = '" + userName + "' AND password = '" + password + "';";
+                System.out.println(SQL);
                 Statement stmt = this.dbConnection.createStatement();
                 ResultSet rs = stmt.executeQuery(SQL);
                 if (rs.next()) {
