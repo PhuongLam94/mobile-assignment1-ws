@@ -29,7 +29,7 @@ public class User {
     private String message;
     private int gender;
     private String birthday;
-    private int friendStatus; //-1: no relationship,0: current user, 1: friend with current user, 2: request sent, 3: request received
+    private int friendStatus; //-1: no relationship,0: current user, 1: friend with current user, 2: request sent, 3: request received, 4: admin
     private float longitude;
     private float lattitude;
     

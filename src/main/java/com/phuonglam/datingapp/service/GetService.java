@@ -79,7 +79,26 @@ public class GetService {
         res.setFriendStatus(friendStatus);
         return Response.status(Response.Status.OK).entity(res).build();
     }
-
+    
+    @GET
+    @Path("/getuseradmin/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserAdmin(@Context HttpHeaders httpHeaders, @PathParam("id") int id) throws ParseException {
+        String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+        User res;
+        boolean isAdmin = authHelper.CheckAdmin(authCredentials);
+        if (!isAdmin) {
+            res = db.GetUserLess(id);
+            res.setMessage("You are not allowed to see full profile of " + res.getName());
+        } else {
+            res = db.GetUserFull(id);
+        }
+        res.setFriendStatus(5);
+        return Response.status(Response.Status.OK).entity(res).build();
+    }
+    
+    
     @GET
     @Path("/getuser/all")
     @Produces(MediaType.APPLICATION_JSON)
