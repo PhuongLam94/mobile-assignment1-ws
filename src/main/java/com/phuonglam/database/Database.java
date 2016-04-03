@@ -117,7 +117,7 @@ public class Database {
         try {
             System.out.println(userName + " " + password + " " + longi + " " + latti);
             if (userName != null && password != null) {
-                if (password.charAt(password.length()-1)==61){
+                if (password.charAt(password.length()-1)==10){
                     password=password.substring(0, password.length()-1);
                 }
                 String SQL = "SELECT id FROM userdb WHERE username = '" + userName + "' AND password = '" + password + "';";
