@@ -125,6 +125,7 @@ public class Database {
                 Statement stmt = this.dbConnection.createStatement();
                 ResultSet rs = stmt.executeQuery(SQL);
                 if (rs.next()) {
+                    System.out.println("Successful");
                     if (longi != 0 && latti != 0) {
                         String SQL2 = String.format(Locale.ENGLISH, "UPDATE userdb set longitude=%f, lattitude=%f WHERE id=%d", longi, latti, rs.getInt(1));
                         System.out.println(SQL2);
@@ -133,6 +134,7 @@ public class Database {
                     }
                     return rs.getInt(1);
                 } else {
+                    System.out.println(SQL);
                     return -1;
                 }
             }
