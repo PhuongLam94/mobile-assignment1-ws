@@ -90,7 +90,7 @@ public class Database {
         }
         return 0;
     }
-    
+
     public int GetMaxFriendId() {
         try {
             String SQL = "SELECT MAX(id) FROM friend";
@@ -115,7 +115,7 @@ public class Database {
         }
         return 0;
     }
-    
+
     public int GetMaxCommentId() {
         try {
             String SQL = "SELECT MAX(id) FROM comment";
@@ -140,13 +140,13 @@ public class Database {
         }
         return 0;
     }
-    
+
     public int CheckUser(String userName, String password, float longi, float latti) {
         try {
             System.out.println(userName + " " + password + " " + longi + " " + latti);
             if (userName != null && password != null) {
-                if (password.charAt(password.length()-1)==10){
-                    password=password.substring(0, password.length()-1);
+                if (password.charAt(password.length() - 1) == 10) {
+                    password = password.substring(0, password.length() - 1);
                 }
                 String SQL = "SELECT id FROM userdb WHERE username = '" + userName + "' AND password = '" + password + "';";
                 System.out.println(SQL);
@@ -487,8 +487,9 @@ public class Database {
         }
         return null;
     }
+
     //get comment
-    public List<Comment> GetListComment(int pictureId){
+    public List<Comment> GetListComment(int pictureId) {
         try {
             String SQL = "SELECT id, userid, pictureid, content, time FROM comment WHERE pictureid='" + pictureId + "';";
             List<Comment> lstComment = new ArrayList<>();
@@ -512,7 +513,7 @@ public class Database {
         }
         return null;
     }
-    
+
     //add functions
     public boolean AddUser(User user) {
         try {
@@ -538,8 +539,10 @@ public class Database {
 
     public boolean AddPicture(Picture picture, int userId) {
         try {
-            System.out.println(picture.getDescription());
-            String SQL = String.format("INSERT INTO Picture(id, content, description, userId, time) VALUES(%d,'%s','%s',%d, '%s')", picture.getId(), picture.getContent(), picture.getDescription(), userId, Calendar.getInstance(TimeZone.getTimeZone("GMT+7:00")).getTime().toString());
+            Date date = new Date();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("GMT+7"));
+            String SQL = String.format("INSERT INTO Picture(id, content, description, userId, time) VALUES(%d,'%s','%s',%d, '%s')", picture.getId(), picture.getContent(), picture.getDescription(), userId, df.format(date));
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             return true;
@@ -558,9 +561,12 @@ public class Database {
         return false;
     }
 
-    public boolean AddComment(Comment comment){
+    public boolean AddComment(Comment comment) {
         try {
-            String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), Calendar.getInstance(TimeZone.getTimeZone("GMT+7:00")).getTime().toString());
+            Date date = new Date();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("GMT+7"));
+            String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), df.format(date));
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             return true;
@@ -578,6 +584,7 @@ public class Database {
         }
         return false;
     }
+
     //edit functions
     public boolean EditUser(User user) {
         try {
@@ -790,8 +797,8 @@ public class Database {
                 * (1 - Math.cos((lon2 - lon1) * p)) / 2;
         return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
     }
-    
-    private Comment _returnComment(ResultSet rs) throws SQLException{
+
+    private Comment _returnComment(ResultSet rs) throws SQLException {
         Comment res = new Comment();
         res.setId(rs.getInt(1));
         res.setUserid(rs.getInt(2));
