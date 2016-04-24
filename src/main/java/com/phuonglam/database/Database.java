@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  *
@@ -538,7 +539,7 @@ public class Database {
     public boolean AddPicture(Picture picture, int userId) {
         try {
             System.out.println(picture.getDescription());
-            String SQL = String.format("INSERT INTO Picture(id, content, description, userId, time) VALUES(%d,'%s','%s',%d, '%s')", picture.getId(), picture.getContent(), picture.getDescription(), userId, Calendar.getInstance().getTime().toString());
+            String SQL = String.format("INSERT INTO Picture(id, content, description, userId, time) VALUES(%d,'%s','%s',%d, '%s')", picture.getId(), picture.getContent(), picture.getDescription(), userId, Calendar.getInstance(TimeZone.getTimeZone("GMT+7:00")).getTime().toString());
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             return true;
@@ -559,7 +560,7 @@ public class Database {
 
     public boolean AddComment(Comment comment){
         try {
-            String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), Calendar.getInstance().getTime().toString());
+            String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), Calendar.getInstance(TimeZone.getTimeZone("GMT+7:00")).getTime().toString());
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             return true;
