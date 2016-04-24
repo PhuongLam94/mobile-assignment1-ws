@@ -119,6 +119,7 @@ public class GetService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOnePicture(@Context HttpHeaders httpHeaders, @PathParam("userId") int userId, @PathParam("pictureId") int pictureId) {
         String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        System.out.println("in get one picture");
         if (authHelper.CheckGetUser(authCredentials, userId) == -1) {
             return Response.status(Response.Status.FORBIDDEN).entity("{\"message\": \"You are not allowed to see this picture\"}").build();
         } else {
@@ -184,6 +185,7 @@ public class GetService {
     @Path("/checkusername/{userName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkUserName(@PathParam("userName") String userName) {
+        System.out.println("enter check username "+userName);
         Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         String res = db.checkUserExist("username", userName) ? "Invalid" : "Valid";
         return Response.status(Response.Status.OK).entity("{\"message\": \"" + res + "\"}").build();

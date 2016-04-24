@@ -39,6 +39,8 @@ public class PutService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response receiveBook(User user, @Context HttpHeaders httpHeaders) {
         String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        int id = authHelper.CheckUser(authCredentials);
+        System.out.println(id);
         if (authHelper.CheckGetUserFriend(authCredentials, user.getId())) {
             System.out.print("In");
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);

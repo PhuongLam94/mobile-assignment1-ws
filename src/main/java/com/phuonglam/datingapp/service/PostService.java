@@ -8,6 +8,7 @@ package com.phuonglam.datingapp.service;
 import com.phuonglam.database.Database;
 import com.phuonglam.helper.AuthenticationHelper;
 import com.phuonglam.helper.ConstantHelper;
+import com.phuonglam.pojo.Comment;
 import com.phuonglam.pojo.Picture;
 import com.phuonglam.pojo.User;
 import javax.ws.rs.Consumes;
@@ -70,4 +71,25 @@ public class PostService {
             return Response.status(Response.Status.OK).entity("{\"message\":\"Forbidden\"}").build();
         }
     }
+    @POST
+    @Path("/comment/add")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addComment(@Context HttpHeaders httpHeaders, Comment comment) {
+        String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+        comment.setId(db.GetMaxCommentId()+1);
+        db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+        int userId = authHelper.CheckGetUser(authCredentials, comment.getUserid());
+        if (userId == 1) {
+            if (db.AddComment(comment)) {
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Successful\"}").build();
+            } else {
+                return Response.status(Response.Status.OK).entity("{\"message\":\"Failed\"}").build();
+            }
+        } else {
+            return Response.status(Response.Status.OK).entity("{\"message\":\"Forbidden\"}").build();
+        }
+    }
+    
 }

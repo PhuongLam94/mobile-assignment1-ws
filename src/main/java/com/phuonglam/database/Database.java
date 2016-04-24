@@ -16,11 +16,13 @@ import java.util.List;
 import java.util.Properties;
 
 import com.phuonglam.helper.ConstantHelper;
+import com.phuonglam.pojo.Comment;
 import com.phuonglam.pojo.Picture;
 import com.phuonglam.pojo.User;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -87,7 +89,7 @@ public class Database {
         }
         return 0;
     }
-
+    
     public int GetMaxFriendId() {
         try {
             String SQL = "SELECT MAX(id) FROM friend";
@@ -112,7 +114,32 @@ public class Database {
         }
         return 0;
     }
+    
+    public int GetMaxCommentId() {
+        try {
+            String SQL = "SELECT MAX(id) FROM comment";
 
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                return 0;
+            }
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return 0;
+    }
+    
     public int CheckUser(String userName, String password, float longi, float latti) {
         try {
             System.out.println(userName + " " + password + " " + longi + " " + latti);
@@ -403,7 +430,7 @@ public class Database {
     public Picture GetPicture(int pictureId, int userId) {
         try {
             System.out.println("in getpicture");
-            String SQL = "SELECT id, content, description FROM Picture WHERE userid = " + userId;
+            String SQL = "SELECT id, content, description, userid, time FROM Picture WHERE userid = " + userId;
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
             Picture res = null;
@@ -459,7 +486,32 @@ public class Database {
         }
         return null;
     }
-
+    //get comment
+    public List<Comment> GetListComment(int pictureId){
+        try {
+            String SQL = "SELECT id, userid, pictureid, content, time FROM comment WHERE pictureid='" + pictureId + "';";
+            List<Comment> lstComment = new ArrayList<>();
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            while (rs.next()) {
+                Comment res = _returnComment(rs);
+                lstComment.add(res);
+            }
+            return lstComment;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+    
     //add functions
     public boolean AddUser(User user) {
         try {
@@ -486,7 +538,7 @@ public class Database {
     public boolean AddPicture(Picture picture, int userId) {
         try {
             System.out.println(picture.getDescription());
-            String SQL = String.format("INSERT INTO Picture(id, content, description, userId) VALUES(%d,'%s','%s',%d)", picture.getId(), picture.getContent(), picture.getDescription(), userId);
+            String SQL = String.format("INSERT INTO Picture(id, content, description, userId, time) VALUES(%d,'%s','%s',%d, '%s')", picture.getId(), picture.getContent(), picture.getDescription(), userId, Calendar.getInstance().getTime().toString());
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             return true;
@@ -505,6 +557,26 @@ public class Database {
         return false;
     }
 
+    public boolean AddComment(Comment comment){
+        try {
+            String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getPictureid(), comment.getUserid(), comment.getContent(), comment.getTime());
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(SQL);
+            return true;
+        } catch (SQLException sqle) {
+            System.out.println("abc");
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return false;
+    }
     //edit functions
     public boolean EditUser(User user) {
         try {
@@ -704,6 +776,9 @@ public class Database {
         res.setId(rs.getInt(1));
         res.setContent(rs.getString(2));
         res.setDescription(rs.getString(3));
+        res.setUserId(rs.getInt(4));
+        res.setTime(rs.getString(5));
+        res.setLstcomment(GetListComment(res.getId()));
         return res;
     }
 
@@ -713,5 +788,15 @@ public class Database {
                 + Math.cos(lat1 * p) * Math.cos(lat2 * p)
                 * (1 - Math.cos((lon2 - lon1) * p)) / 2;
         return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+    }
+    
+    private Comment _returnComment(ResultSet rs) throws SQLException{
+        Comment res = new Comment();
+        res.setId(rs.getInt(1));
+        res.setUserid(rs.getInt(2));
+        res.setPictureid(rs.getInt(3));
+        res.setContent(rs.getString(4));
+        res.setTime(rs.getString(5));
+        return res;
     }
 }

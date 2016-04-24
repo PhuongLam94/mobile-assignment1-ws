@@ -5,6 +5,8 @@
  */
 package com.phuonglam.pojo;
 
+import java.util.List;
+
 /**
  *
  * @author Phuo
@@ -16,6 +18,9 @@ public class Picture {
     private String message;
     private int prev;
     private int next;
+    private int userid;
+    private String time;
+    private List<Comment> lstcomment;
     
     public String getContent(){return this.content;}
     public void setContent(String content){this.content = content;}
@@ -35,4 +40,12 @@ public class Picture {
      public int getNext(){return this.next;}
     public void setNext(int next){this.next = next;}
     
+    public int getUserid(){return this.userid;}
+    public void setUserId(int userid){this.userid = userid;}
+    
+    public String getTime(){return this.time;}
+    public void setTime(String time){this.time = time;}
+    
+    public List<Comment> getLstcomment() {return this.lstcomment;}
+    public void setLstcomment(List<Comment> lstcomment){this.lstcomment = lstcomment;}
 }
