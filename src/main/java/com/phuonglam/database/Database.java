@@ -559,7 +559,7 @@ public class Database {
 
     public boolean AddComment(Comment comment){
         try {
-            String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), comment.getTime());
+            String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), Calendar.getInstance().getTime().toString());
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
             return true;
