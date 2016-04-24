@@ -81,7 +81,7 @@ public class PostService {
         comment.setId(db.GetMaxCommentId()+1);
         db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         int userId = authHelper.CheckGetUser(authCredentials, comment.getUserid());
-        if (userId == 1) {
+        if (userId == 1 || userId == 0) {
             if (db.AddComment(comment)) {
                 return Response.status(Response.Status.OK).entity("{\"message\": \"Successful\"}").build();
             } else {
