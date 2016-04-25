@@ -138,8 +138,8 @@ public class GetService {
             return Response.status(Response.Status.FORBIDDEN).entity("{\"message\": \"You are not allowed to see all pictures of this user\"}").build();
         } else {
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
-            List<Picture> res = db.GetListAllPicture(userId);
-            System.out.println(res.size());
+           List<Picture> res = db.GetListAllPicture(userId);
+           System.out.println(res == null);
             return Response.status(Response.Status.OK).entity(new GenericEntity<List<Picture>>(res) {
             }).build();
         }
@@ -198,5 +198,21 @@ public class GetService {
         Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         String res = db.checkUserExist("email", email) ? "Invalid" : "Valid";
         return Response.status(Response.Status.OK).entity("{\"message\": \"" + res + "\"}").build();
+    }
+    
+    @GET
+    @Path("/picture/{userId}/friend/{offset}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFriendPicture(@Context HttpHeaders httpHeaders, @PathParam("userId") int userId, @PathParam("offset") int offset){
+        String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
+        if (!authHelper.CheckGetUserFriend(authCredentials, userId)) {
+            return Response.status(Response.Status.OK).entity("{\"message\": \"You are not allowed to see this user's friend list\"}").build();
+        } else {
+            Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+            List<User> res = db.GetUserFriendList(userId);
+            return Response.status(Response.Status.OK).entity(new GenericEntity<List<User>>(res) {
+            }).build();
+
+        }
     }
 }

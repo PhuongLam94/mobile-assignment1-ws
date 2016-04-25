@@ -41,7 +41,7 @@ public class Picture {
     public void setNext(int next){this.next = next;}
     
     public int getUserid(){return this.userid;}
-    public void setUserId(int userid){this.userid = userid;}
+    public void setUserid(int userid){this.userid = userid;}
     
     public String getTime(){return this.time;}
     public void setTime(String time){this.time = time;}

@@ -15,6 +15,7 @@ public class Comment {
     private int id;
     private String content;
     private String time;
+    private String name;
     
     public int getUserid(){ return this.userid;}
     public void setUserid(int userid){this.userid = userid;}
@@ -30,4 +31,7 @@ public class Comment {
     
     public String getTime(){return this.time;}
     public void setTime(String time){this.time = time;}
+    
+    public String getName(){return this.name;}
+    public void setName(String name){this.name = name;}
 }

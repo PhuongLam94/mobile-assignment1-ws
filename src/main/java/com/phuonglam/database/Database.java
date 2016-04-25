@@ -463,13 +463,12 @@ public class Database {
 
     public List<Picture> GetListAllPicture(int userId) {
         try {
-            System.out.println("in db");
-            String SQL = "SELECT id, content, description FROM Picture WHERE userId='" + userId + "';";
+            String SQL = "SELECT id, content, description, userid, time FROM Picture WHERE userId='" + userId + "';";
             List<Picture> lstPicture = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
-            System.out.println("success");
             while (rs.next()) {
+                System.out.println("success");
                 Picture res = _returnPicture(rs);
                 lstPicture.add(res);
             }
@@ -487,19 +486,19 @@ public class Database {
         }
         return null;
     }
-
-    //get comment
-    public List<Comment> GetListComment(int pictureId) {
+    
+    public List<Picture> GetFriendPicture(int userId, int offset){
         try {
-            String SQL = "SELECT id, userid, pictureid, content, time FROM comment WHERE pictureid='" + pictureId + "';";
-            List<Comment> lstComment = new ArrayList<>();
+            String SQL = String.format("SELECT p.id, p.content, p.description, p.userid, p.time FROM Picture p, friend f WHERE (p.userid=%d AND f.user1id!=%d AND f.user2id!=%d) OR (f.user1id=%d AND p.userid=f.user2id) OR (f.user2id=%d AND p.userid=f.user1id);", userId, userId, userId, userId, userId);
+            List<Picture> lstPicture = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
             while (rs.next()) {
-                Comment res = _returnComment(rs);
-                lstComment.add(res);
+                System.out.println("success");
+                Picture res = _returnPicture(rs);
+                lstPicture.add(res);
             }
-            return lstComment;
+            return lstPicture;
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
         } finally {
@@ -511,6 +510,24 @@ public class Database {
                 }
             }
         }
+        return null;
+    }
+    
+    //get comment
+    private List<Comment> _getListComment(int pictureId) {
+        try {
+            String SQL = "SELECT c.id, c.userid, c.pictureid, c.content, c.time, u.name FROM comment c, userdb u WHERE pictureid='" + pictureId + "' AND c.userid = u.id;";
+            List<Comment> lstComment = new ArrayList<>();
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            while (rs.next()) {
+                Comment res = _returnComment(rs);
+                lstComment.add(res);
+            }
+            return lstComment;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } 
         return null;
     }
 
@@ -784,9 +801,10 @@ public class Database {
         res.setId(rs.getInt(1));
         res.setContent(rs.getString(2));
         res.setDescription(rs.getString(3));
-        res.setUserId(rs.getInt(4));
+        res.setUserid(rs.getInt(4));
         res.setTime(rs.getString(5));
-        res.setLstcomment(GetListComment(res.getId()));
+            
+        res.setLstcomment(_getListComment(res.getId()));
         return res;
     }
 
@@ -805,6 +823,7 @@ public class Database {
         res.setPictureid(rs.getInt(3));
         res.setContent(rs.getString(4));
         res.setTime(rs.getString(5));
+        res.setName(rs.getString(6));
         return res;
     }
 }
