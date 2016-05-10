@@ -11,11 +11,13 @@ import com.phuonglam.helper.ConstantHelper;
 import com.phuonglam.pojo.Comment;
 import com.phuonglam.pojo.Picture;
 import com.phuonglam.pojo.User;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -76,19 +78,19 @@ public class PostService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addComment(@Context HttpHeaders httpHeaders, Comment comment) {
+        System.out.println("Get in add comment");
         String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
         Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         comment.setId(db.GetMaxCommentId()+1);
         db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         int userId = authHelper.CheckGetUser(authCredentials, comment.getUserid());
         if (userId == 1 || userId == 0) {
-            if (db.AddComment(comment)) {
-                return Response.status(Response.Status.OK).entity("{\"message\": \"Successful\"}").build();
-            } else {
-                return Response.status(Response.Status.OK).entity("{\"message\":\"Failed\"}").build();
-            }
+                List<Comment> lstComment = db.AddComment(comment);
+                System.out.println(lstComment.size());
+                 return Response.status(Response.Status.OK).entity(new GenericEntity<List<Comment>>(lstComment) {
+            }).build();
         } else {
-            return Response.status(Response.Status.OK).entity("{\"message\":\"Forbidden\"}").build();
+            return Response.status(Response.Status.OK).entity(null).build();
         }
     }
     
