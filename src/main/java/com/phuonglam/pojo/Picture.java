@@ -21,6 +21,8 @@ public class Picture {
     private int userid;
     private String time;
     private List<Comment> lstcomment;
+    private String name;
+    
     
     public String getContent(){return this.content;}
     public void setContent(String content){this.content = content;}
@@ -48,4 +50,7 @@ public class Picture {
     
     public List<Comment> getLstcomment() {return this.lstcomment;}
     public void setLstcomment(List<Comment> lstcomment){this.lstcomment = lstcomment;}
+    
+    public String getName(){return this.name;}
+    public void setName(String name){this.name = name;}
 }

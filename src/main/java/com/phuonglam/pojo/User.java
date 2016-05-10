@@ -93,4 +93,9 @@ public class User {
     
     public float getLattitude(){return this.lattitude;}
     public void setLattitude(float lattitude){this.lattitude = lattitude;}
+    
+    @Override
+    public String toString(){
+        return "Username: "+test+", lon: "+longitude+", lat: "+lattitude;
+    }
 }

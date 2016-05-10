@@ -165,8 +165,10 @@ public class GetService {
     @Path("/getnear/{userId}/{lon}/{lat}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNear(@PathParam("userId") int userId, @PathParam("lon") float lon, @PathParam("lat") float lat) {
+        System.out.println("in get near "+lon+", "+lat);
         Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         List<User> res = db.GetUserNear(lon, lat, userId);
+        System.out.print(res.toString());
         return Response.status(Response.Status.OK).entity(new GenericEntity<List<User>>(res) {
         }).build();
     }
@@ -201,16 +203,16 @@ public class GetService {
     }
     
     @GET
-    @Path("/picture/{userId}/friend/{offset}")
+    @Path("/getfriendpicture/{userId}/{offset}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFriendPicture(@Context HttpHeaders httpHeaders, @PathParam("userId") int userId, @PathParam("offset") int offset){
         String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
         if (!authHelper.CheckGetUserFriend(authCredentials, userId)) {
-            return Response.status(Response.Status.OK).entity("{\"message\": \"You are not allowed to see this user's friend list\"}").build();
+            return Response.status(Response.Status.OK).entity("{\"message\": \"You are not allowed to see this user's newsfeed\"}").build();
         } else {
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
-            List<User> res = db.GetUserFriendList(userId);
-            return Response.status(Response.Status.OK).entity(new GenericEntity<List<User>>(res) {
+            List<Picture> res = db.GetFriendPicture(userId, offset);
+            return Response.status(Response.Status.OK).entity(new GenericEntity<List<Picture>>(res) {
             }).build();
 
         }

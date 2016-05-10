@@ -431,7 +431,7 @@ public class Database {
     public Picture GetPicture(int pictureId, int userId) {
         try {
             System.out.println("in getpicture");
-            String SQL = "SELECT id, content, description, userid, time FROM Picture WHERE userid = " + userId;
+            String SQL = "SELECT p.id, p.content, p.description, p.userid, p.time, u.name FROM Picture p, userdb u WHERE p.userid = u.id AND p.userid = " + userId;
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
             Picture res = null;
@@ -463,7 +463,7 @@ public class Database {
 
     public List<Picture> GetListAllPicture(int userId) {
         try {
-            String SQL = "SELECT id, content, description, userid, time FROM Picture WHERE userId='" + userId + "';";
+            String SQL = "SELECT p.id, p.content, p.description, p.userid, p.time, u.name FROM Picture p, userdb u WHERE p.userId='" + userId + "' AND p.userid=u.id;";
             List<Picture> lstPicture = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
@@ -489,7 +489,9 @@ public class Database {
     
     public List<Picture> GetFriendPicture(int userId, int offset){
         try {
-            String SQL = String.format("SELECT p.id, p.content, p.description, p.userid, p.time FROM Picture p, friend f WHERE (p.userid=%d AND f.user1id!=%d AND f.user2id!=%d) OR (f.user1id=%d AND p.userid=f.user2id) OR (f.user2id=%d AND p.userid=f.user1id);", userId, userId, userId, userId, userId);
+            String SQL = String.format("SELECT p.id, p.content, p.description, p.userid, p.time, u.name FROM Picture p, friend f, userdb u WHERE "
+                    + "((p.userid=%d AND f.user1id!=%d AND f.user2id!=%d) OR (f.user1id=%d AND p.userid=f.user2id) OR (f.user2id=%d AND p.userid=f.user1id)) AND u.id = p.userid"
+                    + " ORDER BY p.time DESC LIMIT 10 OFFSET %d;", userId, userId, userId, userId, userId, offset);
             List<Picture> lstPicture = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
@@ -803,7 +805,7 @@ public class Database {
         res.setDescription(rs.getString(3));
         res.setUserid(rs.getInt(4));
         res.setTime(rs.getString(5));
-            
+        res.setName(rs.getString(6));
         res.setLstcomment(_getListComment(res.getId()));
         return res;
     }

@@ -22,7 +22,7 @@ public class ConstantHelper {
     public static final String HOST = "ec2-107-22-248-209.compute-1.amazonaws.com";
     public static final String DBNAME = "da7m95j4p26es8";
     public static final String USER = "xzfaroskvpqusb";
-    public static final String PASS = "cNXhT7m_hJP0ApnLkBVzr6_9NG";
+        public static final String PASS = "cNXhT7m_hJP0ApnLkBVzr6_9NG";
     public static final int PORT = 5432;
     public static final String CONNECTTODB = "psql -h ec2-107-22-248-209.compute-1.amazonaws.com -p 5432 -U xzfaroskvpqusb da7m95j4p26es8";
     public static final String DEFAULTPASSWORD="123456@#";
