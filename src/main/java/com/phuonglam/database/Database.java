@@ -580,7 +580,7 @@ public class Database {
         return false;
     }
 
-    public boolean AddComment(Comment comment) {
+    public List<Comment> AddComment(Comment comment) {
         try {
             Date date = new Date();
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -588,7 +588,8 @@ public class Database {
             String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), df.format(date));
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
-            return true;
+            System.out.println("Getting comment");
+            return _getListComment(comment.getPictureid());
         } catch (SQLException sqle) {
             System.out.println("abc");
             System.err.println(sqle.getMessage());
@@ -601,7 +602,7 @@ public class Database {
                 }
             }
         }
-        return false;
+        return null;
     }
 
     //edit functions
