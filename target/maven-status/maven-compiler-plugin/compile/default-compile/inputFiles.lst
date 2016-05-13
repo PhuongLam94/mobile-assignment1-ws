@@ -1,6 +1,7 @@
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\datingapp\service\DeleteService.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\helper\ConstantHelper.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\org\netbeans\rest\application\config\ApplicationConfig.java
+F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\pojo\PostMessage.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\datingapp\service\GetService.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\datingapp\service\PostService.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\pojo\Picture.java
@@ -8,6 +9,7 @@ F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\pojo\Comment.
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\datingapp\service\COSRFilter.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\datingapp\service\GenericResource.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\datingapp\service\PutService.java
+F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\helper\ApiEndpointInterface.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\helper\AuthenticationHelper.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\pojo\Password.java
 F:\2015\MobileProgramming\DatingApp-V3\src\main\java\com\phuonglam\pojo\User.java

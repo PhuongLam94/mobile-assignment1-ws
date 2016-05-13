@@ -5,6 +5,7 @@
  */
 package com.phuonglam.database;
 
+import com.phuonglam.helper.ApiEndpointInterface;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,7 +19,10 @@ import java.util.Properties;
 import com.phuonglam.helper.ConstantHelper;
 import com.phuonglam.pojo.Comment;
 import com.phuonglam.pojo.Picture;
+import com.phuonglam.pojo.PostMessage;
+import com.phuonglam.pojo.PostMessage.DataContent;
 import com.phuonglam.pojo.User;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,6 +32,16 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import okhttp3.Interceptor;
+import okhttp3.Interceptor.Chain;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  *
@@ -698,6 +712,7 @@ public class Database {
                     break;
                 case 1:
                     SQL = String.format("UPDATE friend SET status=1 WHERE user1id=%d AND user2id=%d AND status=2", user2Id, user1Id);
+                    
                     break;
                 case 2:
                     SQL = String.format("INSERT INTO friend(id, user1id, user2id, status) VALUES (%d, %d, %d, %d)", friendId, user1Id, user2Id, 2);
@@ -705,7 +720,54 @@ public class Database {
             }
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
-            System.out.println("abc");
+            if (friendStatus == 1){
+                Interceptor interceptor = new Interceptor() {
+                @Override
+                public okhttp3.Response intercept(Chain chain) throws IOException {
+                    Request newRequest = chain.request().newBuilder()
+                            .addHeader("authorization", "key=AIzaSyBTlnccHmwHVwXdFdWDURW1FhyC9iRGSYY")
+                            .addHeader("Content-Type", "application/json")
+                            .build();
+                    return chain.proceed(newRequest);
+                }
+            };
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.interceptors().add(interceptor);
+            OkHttpClient client = builder.build();
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("https://gcm-http.googleapis.com/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
+                    .build();
+            ApiEndpointInterface apiService = retrofit.create(ApiEndpointInterface.class);
+            PostMessage message = new PostMessage();
+            message.data = new DataContent();
+            message.data.title="Frient request accepted";
+            message.data.body="Someone accept your friend request";
+            String SQL2 = "SELECT token FROM tokenuser WHERE userid="+user1Id+";";
+            ResultSet rs = stmt.executeQuery(SQL2);
+            List<String> lstToken = new ArrayList<>();
+            while (rs.next()){
+                lstToken.add(rs.getString(1));
+            }
+            message.registration_ids=lstToken;
+            if (lstToken.size()>0){
+                Call<ResponseBody> call = apiService.sendMessage(message);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    System.out.println(response.body()==null?"null":response.body().toString());
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    
+                }
+            });
+            }
+            
+            }
             return true;
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
