@@ -753,11 +753,17 @@ public class Database {
             }
             message.registration_ids=lstToken;
             if (lstToken.size()>0){
+                System.out.print(lstToken.get(0));
+                
                 Call<ResponseBody> call = apiService.sendMessage(message);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    System.out.println(response.body()==null?"null":response.body().toString());
+                    try {
+                        System.out.println(response.body()==null?"null":response.body().string());
+                    } catch (IOException ex) {
+                        Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
 
                 @Override
