@@ -142,8 +142,24 @@ public class Database {
         }
         return 0;
     }
+    private int GetMaxUserTokenId() {
+        try {
+            String SQL = "SELECT MAX(id) FROM tokenuser";
 
-    public int CheckUser(String userName, String password, float longi, float latti) {
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                return 0;
+            }
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        }
+        return 0;
+    }
+
+    public int CheckUser(String userName, String password, float longi, float latti, String token) {
         try {
             System.out.println(userName + " " + password + " " + longi + " " + latti);
             if (userName != null && password != null) {
@@ -161,6 +177,14 @@ public class Database {
                         System.out.println(SQL2);
                         Statement stmt2 = this.dbConnection.createStatement();
                         stmt2.execute(SQL2);
+                    }
+                    if (!token.equals("")){
+                        String SQL3 = "DELETE FROM tokenuser WHERE token='"+token+"';";
+                        Statement stmt3 = this.dbConnection.createStatement();
+                        stmt3.execute(SQL3);
+                        String SQL4 = "INSERT INTO tokenuser(id, userid, token) VALUES ("+(GetMaxUserTokenId()+1)+", "+rs.getInt(1)+", '"+token+"');";
+                        Statement stmt4 = this.dbConnection.createStatement();
+                        stmt4.execute(SQL4);
                     }
                     return rs.getInt(1);
                 } else {

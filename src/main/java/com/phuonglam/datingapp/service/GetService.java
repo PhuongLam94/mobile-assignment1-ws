@@ -37,11 +37,11 @@ public class GetService {
     }
 
     @GET
-    @Path("/checkuser/{longi}/{latti}")
+    @Path("/checkuser/{longi}/{latti}/{token}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response checkUser(@Context HttpHeaders httpHeaders, @PathParam("longi") float longi, @PathParam("latti") float latti) {
+    public Response checkUser(@Context HttpHeaders httpHeaders, @PathParam("longi") float longi, @PathParam("latti") float latti, @PathParam("token") String token) {
         String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
-        int res = authHelper.CheckUser(authCredentials, longi, latti);
+        int res = authHelper.CheckUser(authCredentials, longi, latti, token);
         if (res == -1) {
             return Response.status(Response.Status.OK).entity("{\"message\": \"User name or password is wrong\"}").build();
         } else {
