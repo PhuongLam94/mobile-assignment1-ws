@@ -182,6 +182,16 @@ public class GetService {
         return Response.status(Response.Status.OK).entity(new GenericEntity<List<User>>(res) {
         }).build();
     }
+    @GET
+    @Path("/searchuserbyage/{userId}/{fromAge}/{toAge}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchUserByAge(@PathParam("userId") int userId, @PathParam("fromAge") int fromAge, @PathParam("toAge") int toAge) {
+        Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
+        List<User> res = db.GetUserSearchByAge(fromAge, toAge, userId);
+        System.out.println(res.size());
+        return Response.status(Response.Status.OK).entity(new GenericEntity<List<User>>(res) {
+        }).build();
+    }
 
     @GET
     @Path("/checkusername/{userName}")

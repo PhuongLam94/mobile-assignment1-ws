@@ -26,6 +26,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -415,6 +417,41 @@ public class Database {
             return lstUser;
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+    public List<User> GetUserSearchByAge(int fromAge, int toAge, int userId) {
+        try {
+            Calendar cal = Calendar.getInstance();
+            int fromYear = cal.get(Calendar.YEAR) - fromAge;
+            int toYear = cal.get(Calendar.YEAR) - toAge;
+            System.out.println(cal.get(Calendar.YEAR)+", "+fromAge+", "+fromYear+", "+toAge+", "+toYear);
+            String SQL = "SELECT name, avatar, id, status, birthdate FROM userdb WHERE id != " + userId;
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            List<User> lstUser = new ArrayList<>();
+            while (rs.next()) {
+                cal.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString(5)));
+                int year = cal.get(Calendar.YEAR);
+                System.out.println(rs.getString(1)+", "+year);
+                if ((fromAge == 0 || year <= fromYear) && (toAge == 0 || year >= toYear)) {
+                    User res = _returnUserLess(rs);
+                    lstUser.add(res);
+                }
+            }
+            return lstUser;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } catch (ParseException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (this.dbConnection != null) {
                 try {
