@@ -192,7 +192,7 @@ public class Database {
                         Statement stmt2 = this.dbConnection.createStatement();
                         stmt2.execute(SQL2);
                     }
-                    if (!token.equals("")){
+                    if (!token.equals("abc")){
                         String SQL3 = "DELETE FROM tokenuser WHERE token='"+token+"';";
                         Statement stmt3 = this.dbConnection.createStatement();
                         stmt3.execute(SQL3);
@@ -745,7 +745,7 @@ public class Database {
             message.data = new DataContent();
             message.data.title="Frient request accepted";
             message.data.body="Someone accept your friend request";
-            String SQL2 = "SELECT token FROM tokenuser WHERE userid="+user1Id+";";
+            String SQL2 = "SELECT token FROM tokenuser WHERE userid="+user2Id+";";
             ResultSet rs = stmt.executeQuery(SQL2);
             List<String> lstToken = new ArrayList<>();
             while (rs.next()){
