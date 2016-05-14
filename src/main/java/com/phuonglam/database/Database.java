@@ -156,6 +156,7 @@ public class Database {
         }
         return 0;
     }
+
     private int GetMaxUserTokenId() {
         try {
             String SQL = "SELECT MAX(id) FROM tokenuser";
@@ -192,11 +193,11 @@ public class Database {
                         Statement stmt2 = this.dbConnection.createStatement();
                         stmt2.execute(SQL2);
                     }
-                    if (!token.equals("abc")){
-                        String SQL3 = "DELETE FROM tokenuser WHERE token='"+token+"';";
+                    if (!token.equals("abc")) {
+                        String SQL3 = "DELETE FROM tokenuser WHERE token='" + token + "';";
                         Statement stmt3 = this.dbConnection.createStatement();
                         stmt3.execute(SQL3);
-                        String SQL4 = "INSERT INTO tokenuser(id, userid, token) VALUES ("+(GetMaxUserTokenId()+1)+", "+rs.getInt(1)+", '"+token+"');";
+                        String SQL4 = "INSERT INTO tokenuser(id, userid, token) VALUES (" + (GetMaxUserTokenId() + 1) + ", " + rs.getInt(1) + ", '" + token + "');";
                         Statement stmt4 = this.dbConnection.createStatement();
                         stmt4.execute(SQL4);
                     }
@@ -466,12 +467,13 @@ public class Database {
         }
         return null;
     }
+
     public List<User> GetUserSearchByAge(int fromAge, int toAge, int userId) {
         try {
             Calendar cal = Calendar.getInstance();
             int fromYear = cal.get(Calendar.YEAR) - fromAge;
             int toYear = cal.get(Calendar.YEAR) - toAge;
-            System.out.println(cal.get(Calendar.YEAR)+", "+fromAge+", "+fromYear+", "+toAge+", "+toYear);
+            System.out.println(cal.get(Calendar.YEAR) + ", " + fromAge + ", " + fromYear + ", " + toAge + ", " + toYear);
             String SQL = "SELECT name, avatar, id, status, birthdate FROM userdb WHERE id != " + userId;
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
@@ -479,7 +481,7 @@ public class Database {
             while (rs.next()) {
                 cal.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString(5)));
                 int year = cal.get(Calendar.YEAR);
-                System.out.println(rs.getString(1)+", "+year);
+                System.out.println(rs.getString(1) + ", " + year);
                 if ((fromAge == 0 || year <= fromYear) && (toAge == 0 || year >= toYear)) {
                     User res = _returnUserLess(rs);
                     lstUser.add(res);
@@ -561,8 +563,8 @@ public class Database {
         }
         return null;
     }
-    
-    public List<Picture> GetFriendPicture(int userId, int offset){
+
+    public List<Picture> GetFriendPicture(int userId, int offset) {
         try {
             String SQL = String.format("SELECT p.id, p.content, p.description, p.userid, p.time, u.name FROM Picture p, friend f, userdb u WHERE "
                     + "((p.userid=%d AND f.user1id!=%d AND f.user2id!=%d) OR (f.user1id=%d AND p.userid=f.user2id) OR (f.user2id=%d AND p.userid=f.user1id)) AND u.id = p.userid"
@@ -589,7 +591,7 @@ public class Database {
         }
         return null;
     }
-    
+
     //get comment
     private List<Comment> _getListComment(int pictureId) {
         try {
@@ -604,7 +606,7 @@ public class Database {
             return lstComment;
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
-        } 
+        }
         return null;
     }
 
@@ -663,7 +665,33 @@ public class Database {
             String SQL = String.format("INSERT INTO comment(id, userid, pictureid, content, time) VALUES(%d,%d, %d, '%s', '%s')", comment.getId(), comment.getUserid(), comment.getPictureid(), comment.getContent(), df.format(date));
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
-            System.out.println("Getting comment");
+            String SQL2 = "SELECT userid FROM picture WHERE id="+comment.getPictureid();
+            ResultSet rs = stmt.executeQuery(SQL2);
+            if (rs.next()){
+                if (comment.getUserid() != rs.getInt(1)){
+                    PostMessage message = new PostMessage();
+                    String SQL3 = "SELECT name FROM userdb WHERE userid="+comment.getUserid();
+                    ResultSet rs1 = stmt.executeQuery(SQL3);
+                    if (rs1.next()){
+                        message.data.body = rs1.getString(1)+" commented on you picture";
+                    }
+                    message.data = new DataContent();
+                    message.data.title = "Frient request accepted";
+                    String SQL4 = "SELECT token FROM tokenuser WHERE userid=" + rs.getInt(1) + ";";
+                    ResultSet rs2 = stmt.executeQuery(SQL4);
+                    List<String> lstToken = new ArrayList<>();
+                    while (rs2.next()) {
+                        lstToken.add(rs2.getString(1));
+                    }
+                    message.registration_ids = lstToken;
+                    if (lstToken.size() > 0) {
+                        pushNotification(message);
+                    }
+
+                }
+            }
+            
+            
             return _getListComment(comment.getPictureid());
         } catch (SQLException sqle) {
             System.out.println("abc");
@@ -712,7 +740,7 @@ public class Database {
                     break;
                 case 1:
                     SQL = String.format("UPDATE friend SET status=1 WHERE user1id=%d AND user2id=%d AND status=2", user2Id, user1Id);
-                    
+
                     break;
                 case 2:
                     SQL = String.format("INSERT INTO friend(id, user1id, user2id, status) VALUES (%d, %d, %d, %d)", friendId, user1Id, user2Id, 2);
@@ -720,59 +748,46 @@ public class Database {
             }
             Statement stmt = this.dbConnection.createStatement();
             stmt.execute(SQL);
-            if (friendStatus == 1){
-                Interceptor interceptor = new Interceptor() {
-                @Override
-                public okhttp3.Response intercept(Chain chain) throws IOException {
-                    Request newRequest = chain.request().newBuilder()
-                            .addHeader("authorization", "key=AIzaSyBTlnccHmwHVwXdFdWDURW1FhyC9iRGSYY")
-                            .addHeader("Content-Type", "application/json")
-                            .build();
-                    return chain.proceed(newRequest);
+            if (friendStatus == 1) {
+                PostMessage message = new PostMessage();
+                String SQL3 = "SELECT name FROM userdb WHERE userid="+user1Id;
+                ResultSet rs1 = stmt.executeQuery(SQL3);
+                if (rs1.next()){
+                    message.data.body = rs1.getString(1)+" accept your friend request";
                 }
-            };
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.interceptors().add(interceptor);
-            OkHttpClient client = builder.build();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("https://gcm-http.googleapis.com/")
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(client)
-                    .build();
-            ApiEndpointInterface apiService = retrofit.create(ApiEndpointInterface.class);
-            PostMessage message = new PostMessage();
-            message.data = new DataContent();
-            message.data.title="Frient request accepted";
-            message.data.body="Someone accept your friend request";
-            String SQL2 = "SELECT token FROM tokenuser WHERE userid="+user2Id+";";
-            ResultSet rs = stmt.executeQuery(SQL2);
-            List<String> lstToken = new ArrayList<>();
-            while (rs.next()){
-                lstToken.add(rs.getString(1));
-            }
-            message.registration_ids=lstToken;
-            if (lstToken.size()>0){
-                System.out.print("TOKEN "+lstToken.size()+", "+lstToken.get(0));
-                
-                Call<ResponseBody> call = apiService.sendMessage(message);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    try {
-                        System.out.println(response.body()==null?"null":response.body().string());
-                    } catch (IOException ex) {
-                        Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                message.data = new DataContent();
+                message.data.title = "Frient request accepted";
+                String SQL2 = "SELECT token FROM tokenuser WHERE userid=" + user2Id + ";";
+                ResultSet rs = stmt.executeQuery(SQL2);
+                List<String> lstToken = new ArrayList<>();
+                while (rs.next()) {
+                    lstToken.add(rs.getString(1));
+                }
+                message.registration_ids = lstToken;
+                if (lstToken.size() > 0) {
+                    pushNotification(message);
                 }
 
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    
-                }
-            });
             }
-            
+            if (friendStatus == 2){
+                PostMessage message = new PostMessage();
+                String SQL3 = "SELECT name FROM userdb WHERE userid="+user1Id;
+                ResultSet rs1 = stmt.executeQuery(SQL3);
+                if (rs1.next()){
+                    message.data.body = rs1.getString(1)+" sent you a friend request";
+                }
+                message.data = new DataContent();
+                message.data.title = "New friend request";
+                String SQL2 = "SELECT token FROM tokenuser WHERE userid=" + user2Id + ";";
+                ResultSet rs = stmt.executeQuery(SQL2);
+                List<String> lstToken = new ArrayList<>();
+                while (rs.next()) {
+                    lstToken.add(rs.getString(1));
+                }
+                message.registration_ids = lstToken;
+                if (lstToken.size() > 0) {
+                    pushNotification(message);
+                }
             }
             return true;
         } catch (SQLException sqle) {
@@ -788,7 +803,45 @@ public class Database {
         }
         return false;
     }
+    public void pushNotification(PostMessage message){
+        Interceptor interceptor = new Interceptor() {
+                        @Override
+                        public okhttp3.Response intercept(Chain chain) throws IOException {
+                            Request newRequest = chain.request().newBuilder()
+                                    .addHeader("authorization", "key=AIzaSyBTlnccHmwHVwXdFdWDURW1FhyC9iRGSYY")
+                                    .addHeader("Content-Type", "application/json")
+                                    .build();
+                            return chain.proceed(newRequest);
+                        }
+                    };
+                    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                    builder.interceptors().add(interceptor);
+                    OkHttpClient client = builder.build();
 
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("https://gcm-http.googleapis.com/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .client(client)
+                            .build();
+                    ApiEndpointInterface apiService = retrofit.create(ApiEndpointInterface.class);
+
+                    Call<ResponseBody> call = apiService.sendMessage(message);
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            try {
+                                System.out.println(response.body() == null ? "null" : response.body().string());
+                            } catch (IOException ex) {
+                                Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                        }
+                    });
+    }
     public boolean EditPassword(int userId, String password) {
         try {
             String SQL = String.format("UPDATE userdb SET password='%s'"
