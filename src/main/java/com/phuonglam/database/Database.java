@@ -753,7 +753,7 @@ public class Database {
             }
             message.registration_ids=lstToken;
             if (lstToken.size()>0){
-                System.out.print(lstToken.get(0));
+                System.out.print("TOKEN "+lstToken.size()+", "+lstToken.get(0));
                 
                 Call<ResponseBody> call = apiService.sendMessage(message);
             call.enqueue(new Callback<ResponseBody>() {
