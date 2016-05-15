@@ -59,6 +59,7 @@ public class PutService {
     @Path("/setfriendstatus/{user1Id}/{user2Id}/{friendStatus}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response setFriendStatus(@Context HttpHeaders httpHeaders, @PathParam("user1Id") int user1Id, @PathParam("user2Id") int user2Id, @PathParam("friendStatus") int friendStatus) {
+        System.out.print("In set friend status");
         String authCredentials = httpHeaders.getRequestHeaders().getFirst("authorization");
         Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         int friendId = db.GetMaxFriendId() + 1;
