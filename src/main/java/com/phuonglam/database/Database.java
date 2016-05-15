@@ -672,6 +672,7 @@ public class Database {
             String SQL2 = "SELECT userid FROM picture WHERE id="+comment.getPictureid();
             ResultSet rs = stmt.executeQuery(SQL2);
             if (rs.next()){
+                String SQL4 = "SELECT token FROM tokenuser WHERE userid=" + rs.getInt(1) + ";";
                 System.out.println("RS 1");
                 if (comment.getUserid() != rs.getInt(1)){
                     PostMessage message = new PostMessage();
@@ -684,7 +685,6 @@ public class Database {
                     }
                     message.data.title = "Frient request accepted";
                     System.out.println("before");
-                    String SQL4 = "SELECT token FROM tokenuser WHERE userid=" + rs.getInt(1) + ";";
                     System.out.println("after");
                     ResultSet rs2 = stmt.executeQuery(SQL4);
                     List<String> lstToken = new ArrayList<>();
