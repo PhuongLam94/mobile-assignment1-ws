@@ -382,6 +382,7 @@ public class Database {
                 int user1 = rs.getInt(1);
                 int user2 = rs.getInt(2);
                 int status = rs.getInt(3);
+                System.out.println("FRIEND "+ user1+", "+user2+", "+status);
                 int getUser;
                 if (user1 == userId) {
                     getUser = user2;
