@@ -661,6 +661,7 @@ public class Database {
 
     public List<Comment> AddComment(Comment comment) {
         try {
+            System.out.println("In comment");
             Date date = new Date();
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             df.setTimeZone(TimeZone.getTimeZone("GMT+7"));
@@ -692,8 +693,6 @@ public class Database {
 
                 }
             }
-            
-            
             return _getListComment(comment.getPictureid());
         } catch (SQLException sqle) {
             System.out.println("abc");
