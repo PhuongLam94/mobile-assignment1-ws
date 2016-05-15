@@ -683,7 +683,7 @@ public class Database {
                     if (rs1.next()){
                         message.data.body = rs1.getString(1)+" commented on you picture";
                     }
-                    message.data.title = "Frient request accepted";
+                    message.data.title = "New comment";
                     System.out.println("before");
                     System.out.println("after");
                     ResultSet rs2 = stmt.executeQuery(SQL4);
