@@ -597,6 +597,7 @@ public class Database {
     //get comment
     private List<Comment> _getListComment(int pictureId) {
         try {
+            
             String SQL = "SELECT c.id, c.userid, c.pictureid, c.content, c.time, u.name FROM comment c, userdb u WHERE pictureid='" + pictureId + "' AND c.userid = u.id;";
             List<Comment> lstComment = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
@@ -671,22 +672,27 @@ public class Database {
             String SQL2 = "SELECT userid FROM picture WHERE id="+comment.getPictureid();
             ResultSet rs = stmt.executeQuery(SQL2);
             if (rs.next()){
+                System.out.println("RS 1");
                 if (comment.getUserid() != rs.getInt(1)){
                     PostMessage message = new PostMessage();
                     message.data = new DataContent();
                     String SQL3 = "SELECT name FROM userdb WHERE id="+comment.getUserid();
                     ResultSet rs1 = stmt.executeQuery(SQL3);
+                    System.out.println("RS 2");
                     if (rs1.next()){
                         message.data.body = rs1.getString(1)+" commented on you picture";
                     }
                     message.data.title = "Frient request accepted";
+                    System.out.println("before");
                     String SQL4 = "SELECT token FROM tokenuser WHERE userid=" + rs.getInt(1) + ";";
+                    System.out.println("after");
                     ResultSet rs2 = stmt.executeQuery(SQL4);
                     List<String> lstToken = new ArrayList<>();
                     while (rs2.next()) {
                         lstToken.add(rs2.getString(1));
                     }
                     message.registration_ids = lstToken;
+                    System.out.println("RS 3");
                     if (lstToken.size() > 0) {
                         pushNotification(message);
                     }
