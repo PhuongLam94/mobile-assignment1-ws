@@ -84,6 +84,7 @@ public class PostService {
         comment.setId(db.GetMaxCommentId()+1);
         db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
         int userId = authHelper.CheckGetUser(authCredentials, comment.getUserid());
+        System.out.println("check get user");
         if (userId == 1 || userId == 0) {
                 List<Comment> lstComment = db.AddComment(comment);
                 System.out.println(lstComment.size());
