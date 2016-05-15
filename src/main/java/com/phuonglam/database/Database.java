@@ -671,12 +671,12 @@ public class Database {
             if (rs.next()){
                 if (comment.getUserid() != rs.getInt(1)){
                     PostMessage message = new PostMessage();
+                    message.data = new DataContent();
                     String SQL3 = "SELECT name FROM userdb WHERE id="+comment.getUserid();
                     ResultSet rs1 = stmt.executeQuery(SQL3);
                     if (rs1.next()){
                         message.data.body = rs1.getString(1)+" commented on you picture";
                     }
-                    message.data = new DataContent();
                     message.data.title = "Frient request accepted";
                     String SQL4 = "SELECT token FROM tokenuser WHERE userid=" + rs.getInt(1) + ";";
                     ResultSet rs2 = stmt.executeQuery(SQL4);
@@ -751,12 +751,12 @@ public class Database {
             stmt.execute(SQL);
             if (friendStatus == 1) {
                 PostMessage message = new PostMessage();
+                message.data = new DataContent();
                 String SQL3 = "SELECT name FROM userdb WHERE id="+user1Id;
                 ResultSet rs1 = stmt.executeQuery(SQL3);
                 if (rs1.next()){
                     message.data.body = rs1.getString(1)+" accept your friend request";
                 }
-                message.data = new DataContent();
                 message.data.title = "Frient request accepted";
                 String SQL2 = "SELECT token FROM tokenuser WHERE userid=" + user2Id + ";";
                 ResultSet rs = stmt.executeQuery(SQL2);
@@ -772,12 +772,12 @@ public class Database {
             }
             if (friendStatus == 2){
                 PostMessage message = new PostMessage();
+                message.data = new DataContent();
                 String SQL3 = "SELECT name FROM userdb WHERE id="+user1Id;
                 ResultSet rs1 = stmt.executeQuery(SQL3);
                 if (rs1.next()){
                     message.data.body = rs1.getString(1)+" sent you a friend request";
                 }
-                message.data = new DataContent();
                 message.data.title = "New friend request";
                 String SQL2 = "SELECT token FROM tokenuser WHERE userid=" + user2Id + ";";
                 ResultSet rs = stmt.executeQuery(SQL2);
