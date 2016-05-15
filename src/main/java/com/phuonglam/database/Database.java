@@ -566,9 +566,9 @@ public class Database {
 
     public List<Picture> GetFriendPicture(int userId, int offset) {
         try {
-            String SQL = String.format("SELECT p.id, p.content, p.description, p.userid, p.time, u.name FROM Picture p, friend f, userdb u WHERE "
-                    + "((p.userid=%d AND f.user1id!=%d AND f.user2id!=%d) OR (f.user1id=%d AND p.userid=f.user2id) OR (f.user2id=%d AND p.userid=f.user1id)) AND u.id = p.userid"
-                    + " ORDER BY p.time DESC LIMIT 10 OFFSET %d;", userId, userId, userId, userId, userId, offset);
+            String SQL = String.format("SELECT DISTINCT p.id, p.content, p.description, p.userid, p.time, u.name FROM Picture p, friend f, userdb u WHERE "
+                    + "((p.userid=%d) OR (f.user1id=%d AND p.userid=f.user2id) OR (f.user2id=%d AND p.userid=f.user1id)) AND u.id = p.userid"
+                    + " ORDER BY p.time DESC LIMIT 10 OFFSET %d;", userId, userId, userId, offset);
             System.out.println("GET NEWSFEED: "+SQL);
             List<Picture> lstPicture = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
