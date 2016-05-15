@@ -71,6 +71,7 @@ public class AuthenticationHelper {
             String[] token = _parseUserNameAndPassword(authCredentials);
             Database db = new Database(ConstantHelper.DBDRIVER, ConstantHelper.HOST, ConstantHelper.DBNAME, ConstantHelper.USER, ConstantHelper.PASS);
             int id = db.CheckUser(token[0], token[1], 0, 0, "");
+           System.out.println("PASSWORD: "+token[1]+", "+password);
             if (token[1].equals(password)){
                 return id;
             } else {
