@@ -374,7 +374,7 @@ public class Database {
 
     public List<User> GetUserFriendList(int userId) {
         try {
-            String SQL = "SELECT user1id,user2id, status FROM Friend WHERE (user1id = '" + userId + "') OR (user2id = '" + userId + "');";
+            String SQL = "SELECT DISTINCT user1id,user2id, status FROM Friend WHERE (user1id = '" + userId + "') OR (user2id = '" + userId + "');";
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
             List<User> lstFriend = new ArrayList<>();
@@ -742,7 +742,6 @@ public class Database {
                     break;
                 case 1:
                     SQL = String.format("UPDATE friend SET status=1 WHERE user1id=%d AND user2id=%d AND status=2", user2Id, user1Id);
-
                     break;
                 case 2:
                     SQL = String.format("INSERT INTO friend(id, user1id, user2id, status) VALUES (%d, %d, %d, %d)", friendId, user1Id, user2Id, 2);
