@@ -598,7 +598,7 @@ public class Database {
     private List<Comment> _getListComment(int pictureId) {
         try {
             
-            String SQL = "SELECT c.id, c.userid, c.pictureid, c.content, c.time, u.name FROM comment c, userdb u WHERE c.pictureid='" + pictureId + "' AND c.userid = u.id ORDER BY c.time DESC;";
+            String SQL = "SELECT c.id, c.userid, c.pictureid, c.content, c.time, u.name FROM comment c, userdb u WHERE c.pictureid='" + pictureId + "' AND c.userid = u.id ORDER BY c.time;";
             List<Comment> lstComment = new ArrayList<>();
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
